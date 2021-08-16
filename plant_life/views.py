@@ -129,14 +129,21 @@ class CreateItem(APIView):
 class GetShopItems(APIView):
     # permission_classes = [IsAuthenticated]
     def post(self, request):
+
         try:
             shop_id = request.POST.get('shop_id',None)
             category_id = request.POST.get('category_id',None)
+            categories = Category.objects.filter(shop__id=shop_id)
+            cat_objects={}
+            for cat in categories:
+                cat_objects[cat.pk]=cat.title
             if shop_id:
                 if not category_id:
                     items = list(Item.objects.filter(shop__id=shop_id).values())
                 else:
                     items = list(Item.objects.filter(shop__id=shop_id,category__id=category_id).values())
+                for item in items:
+                    item['category_title'] = cat_objects[item['category_id']]
                 return JsonResponse({'status':'true','items':items})
             else:
                 return JsonResponse({'status':'false','message': 'No shop_id were provided'})
