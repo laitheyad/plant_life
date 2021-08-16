@@ -1,4 +1,3 @@
-
 from django.contrib import auth
 from django.contrib.auth.models import User as SuperUser
 from django.http import JsonResponse, HttpResponse
@@ -9,6 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView  # Create your views here.
 from .models import *
 from .serializers import *
+
 
 class RegisterUser(APIView):
     def post(self, request):
@@ -77,39 +77,48 @@ class Login(APIView):
             else:
                 return JsonResponse({'message': 'Credentials are not correct !'})
         except Exception as e:
-            print('error : ',e)
+            print('error : ', e)
             return JsonResponse({'message': 'error while getting user info'})
         return JsonResponse({'message': 'success', 'user_obj': consumer, 'username': username, 'token': token.key})
 
 
 class CreateShop(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
+
     def post(self, request):
         try:
             name = request.POST['name']
             Shop.objects.create(name=name)
-            return JsonResponse({'status':'true','message': 'shop : {} created seccussfully'.format(name)})
+            return JsonResponse({'status': 'true', 'message': 'shop : {} created seccussfully'.format(name)})
 
         except:
-            return JsonResponse({'status':'false','message': 'error while receiving data'})
+            return JsonResponse({'status': 'false', 'message': 'error while receiving data'})
+
+    def get(self,request):
+        shops = list(Shop.objects.all().values())
+        return JsonResponse({'status': 'true', 'items': shops})
 
 
 class CreateCategory(APIView):
     permission_classes = [IsAuthenticated]
+
     def post(self, request):
         try:
             shop_id = request.POST['shop_id']
             title = request.POST['title']
             shop = Shop.objects.get(pk=shop_id)
-            Category.objects.create(shop=shop,title=title)
-            return JsonResponse({'status':'true','message': 'Category : {} for shop : {} created seccussfully'.format(title,shop.name)})
+            Category.objects.create(shop=shop, title=title)
+            return JsonResponse({'status': 'true',
+                                 'message': 'Category : {} for shop : {} created seccussfully'.format(title,
+                                                                                                      shop.name)})
 
         except:
-            return JsonResponse({'status':'false','message': 'error while receiving data'})
+            return JsonResponse({'status': 'false', 'message': 'error while receiving data'})
 
 
 class CreateItem(APIView):
     permission_classes = [IsAuthenticated]
+
     def post(self, request):
         try:
             shop_id = request.POST['shop_id']
@@ -119,11 +128,13 @@ class CreateItem(APIView):
             price = request.POST['price']
             shop = Shop.objects.get(pk=shop_id)
             category = Category.objects.get(pk=category_id)
-            Item.objects.create(shop=shop,category=category,title=title,quantity=quantity,price=price)
-            return JsonResponse({'status':'true','message': 'Item : {} for category : {} from shop : {} created seccussfully'.format(title,category.title,shop.name)})
+            Item.objects.create(shop=shop, category=category, title=title, quantity=quantity, price=price)
+            return JsonResponse({'status': 'true',
+                                 'message': 'Item : {} for category : {} from shop : {} created seccussfully'.format(
+                                     title, category.title, shop.name)})
 
         except:
-            return JsonResponse({'status':'false','message': 'error while receiving data'})
+            return JsonResponse({'status': 'false', 'message': 'error while receiving data'})
 
 
 class GetShopItems(APIView):
@@ -131,25 +142,25 @@ class GetShopItems(APIView):
     def post(self, request):
 
         try:
-            shop_id = request.POST.get('shop_id',None)
-            category_id = request.POST.get('category_id',None)
+            shop_id = request.POST.get('shop_id', None)
+            category_id = request.POST.get('category_id', None)
             categories = Category.objects.filter(shop__id=shop_id)
-            cat_objects={}
+            cat_objects = {}
             for cat in categories:
-                cat_objects[cat.pk]=cat.title
+                cat_objects[cat.pk] = cat.title
             if shop_id:
                 if not category_id:
                     items = list(Item.objects.filter(shop__id=shop_id).values())
                 else:
-                    items = list(Item.objects.filter(shop__id=shop_id,category__id=category_id).values())
+                    items = list(Item.objects.filter(shop__id=shop_id, category__id=category_id).values())
                 for item in items:
                     item['category_title'] = cat_objects[item['category_id']]
-                return JsonResponse({'status':'true','items':items})
+                return JsonResponse({'status': 'true', 'items': items})
             else:
-                return JsonResponse({'status':'false','message': 'No shop_id were provided'})
+                return JsonResponse({'status': 'false', 'message': 'No shop_id were provided'})
         except Exception as e:
-            print (e)
-            return JsonResponse({'status':'false','message': 'error while receiving data'})
+            print(e)
+            return JsonResponse({'status': 'false', 'message': 'error while receiving data'})
 
 # class UpdateInfo(viewsets.ReadOnlyModelViewSet):
 #     permission_classes = [IsAuthenticated]
