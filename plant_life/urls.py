@@ -26,7 +26,7 @@ urlpatterns = [
     path('create-shop/', CreateShop.as_view(), name='create-shop'),
     path('create-category/', CreateCategory.as_view(), name='create-category'),
     path('create-item/', CreateItem.as_view(), name='create-item'),
-    path('get-shop-items/', GetShopItems.as_view(), name='login'),
+    path('get-shop-items/', GetShopItems.as_view(), name='get-shop-items'),
 ]
 
 if settings.DEBUG:

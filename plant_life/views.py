@@ -75,11 +75,13 @@ class Login(APIView):
                 else:
                     token = Token.objects.create(user=user)
             else:
-                return JsonResponse({'message': 'Credentials are not correct !'})
+                return JsonResponse({'status': 'false', 'message': 'Credentials are not correct !'})
         except Exception as e:
             print('error : ', e)
-            return JsonResponse({'message': 'error while getting user info'})
-        return JsonResponse({'message': 'success', 'user_obj': consumer, 'username': username, 'token': token.key})
+            return JsonResponse({'status': 'success', 'message': 'error while getting user info'})
+        return JsonResponse(
+            {'status': 'success', 'message': 'user logged in successfully', 'user_obj': consumer, 'username': username,
+             'token': token.key})
 
 
 class CreateShop(APIView):
@@ -94,7 +96,7 @@ class CreateShop(APIView):
         except:
             return JsonResponse({'status': 'false', 'message': 'error while receiving data'})
 
-    def get(self,request):
+    def get(self, request):
         shops = list(Shop.objects.all().values())
         return JsonResponse({'status': 'true', 'items': shops})
 
@@ -155,7 +157,7 @@ class GetShopItems(APIView):
                     items = list(Item.objects.filter(shop__id=shop_id, category__id=category_id).values())
                 for item in items:
                     item['category_title'] = cat_objects[item['category_id']]
-                return JsonResponse({'status': 'true', 'items': items})
+                return JsonResponse({'status': 'success', 'items': items})
             else:
                 return JsonResponse({'status': 'false', 'message': 'No shop_id were provided'})
         except Exception as e:
