@@ -47,6 +47,7 @@ class Item(models.Model):
     quantity = models.IntegerField(default=1)
     price = models.FloatField(default=10.0)
     avatar = models.ImageField(null=True, blank=True)
+    avatar_2 = models.ImageField(null=True, blank=True)
     description = models.TextField(null=True, blank=True)
 
     def __str__(self):

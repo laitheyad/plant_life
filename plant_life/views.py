@@ -98,6 +98,12 @@ class CreateShop(APIView):
 
     def get(self, request):
         shops = list(Shop.objects.all().values())
+        for shop in shops:
+            cat_list = []
+            cat = Category.objects.filter(shop=shop['id'])
+            for c in cat:
+                cat_list.append({'title':c.title,'id':c.id})
+            shop['category_list'] = cat_list
         return JsonResponse({'status': 'true', 'items': shops})
 
 
