@@ -178,6 +178,10 @@ def convert_to_list(string):
     return string_list
 
 
+def random_name(length):
+    return ''.join(
+        random.choice(string.digits) for _ in range(length))
+
 class Orders(APIView):
     def post(self, request):
         try:
@@ -186,14 +190,14 @@ class Orders(APIView):
             shop_id = request.POST['shop_id']
             user = User.objects.get(username__username=username)
             print(items_ids)
-
+            bill_id =random_name(10)
             items_ids = convert_to_list(items_ids)
             for item_id in items_ids:
                 item = Item.objects.get(pk=list(item_id.keys())[0])
                 order = Order.objects.create(shop=Shop.objects.get(id=shop_id), item=item, user=user,
                                              quantity=item_id[list(item_id.keys())[0]],
-                                             total_price=item_id[list(item_id.keys())[0]] * item.price)
-                bill_id = order.bill_id
+                                             total_price=item_id[list(item_id.keys())[0]] * item.price,bill_id=bill_id)
+
             return JsonResponse({'status': 'success', 'message': bill_id})
         except Exception as e:
             print(e)

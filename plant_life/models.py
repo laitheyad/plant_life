@@ -57,19 +57,15 @@ class Item(models.Model):
         return '{} || {} ||{}'.format(str(self.shop.name), str(self.category.title), self.title)
 
 
-def random_name(length):
-    return ''.join(
-        random.choice(string.digits) for _ in range(length))
-
 
 class Order(models.Model):
-    shop = models.ForeignKey(Shop,on_delete=models.DO_NOTHING)
+    shop = models.ForeignKey(Shop, on_delete=models.DO_NOTHING)
     date = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
     item = models.ForeignKey(Item, on_delete=models.DO_NOTHING)
     quantity = models.IntegerField(null=True, blank=True)
     total_price = models.FloatField(null=True, blank=True)
-    bill_id = models.CharField(max_length=100,default=random_name(10))
+    bill_id = models.CharField(max_length=100, null=True, blank=True)
 
     def __str__(self):
         return '{} || {} ||{}'.format(str(self.user), str(self.item.title), self.total_price)
