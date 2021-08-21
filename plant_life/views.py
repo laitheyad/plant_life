@@ -1,3 +1,5 @@
+import ast
+
 from django.contrib import auth
 from django.contrib.auth.models import User as SuperUser
 from django.http import JsonResponse, HttpResponse
@@ -102,7 +104,7 @@ class CreateShop(APIView):
             cat_list = []
             cat = Category.objects.filter(shop=shop['id'])
             for c in cat:
-                cat_list.append({'title':c.title,'id':c.id})
+                cat_list.append({'title': c.title, 'id': c.id})
             shop['category_list'] = cat_list
         return JsonResponse({'status': 'true', 'items': shops})
 
@@ -169,6 +171,43 @@ class GetShopItems(APIView):
         except Exception as e:
             print(e)
             return JsonResponse({'status': 'false', 'message': 'error while receiving data'})
+
+
+def convert_to_list(string):
+    string_list = ast.literal_eval(string)
+    return string_list
+
+
+class Orders(APIView):
+    def post(self, request):
+        try:
+            items_ids = request.POST['items_ids']
+            username = request.POST['username']
+            shop_id = request.POST['shop_id']
+            user = User.objects.get(username__username=username)
+            print(items_ids)
+
+            items_ids = convert_to_list(items_ids)
+            for item_id in items_ids:
+                item = Item.objects.get(pk=list(item_id.keys())[0])
+                order = Order.objects.create(shop=Shop.objects.get(id=shop_id), item=item, user=user,
+                                             quantity=item_id[list(item_id.keys())[0]],
+                                             total_price=item_id[list(item_id.keys())[0]] * item.price)
+                bill_id = order.bill_id
+            return JsonResponse({'status': 'success', 'message': bill_id})
+        except Exception as e:
+            print(e)
+            return JsonResponse({'status': 'false', 'message': str(e)})
+
+    def get(self, request):
+        shops = list(Shop.objects.all().values())
+        for shop in shops:
+            cat_list = []
+            cat = Category.objects.filter(shop=shop['id'])
+            for c in cat:
+                cat_list.append({'title': c.title, 'id': c.id})
+            shop['category_list'] = cat_list
+        return JsonResponse({'status': 'true', 'items': shops})
 
 # class UpdateInfo(viewsets.ReadOnlyModelViewSet):
 #     permission_classes = [IsAuthenticated]

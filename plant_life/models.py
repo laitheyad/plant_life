@@ -1,3 +1,6 @@
+import random
+import string
+
 from django.db import models
 from django.conf import settings
 from django.db import models
@@ -19,7 +22,7 @@ class User(models.Model):
     status = models.CharField(choices=status_selection, default='Customer', max_length=20)
 
     def __str__(self):
-        return u'{} {} || status: {}'.format(self.first_name, self.last_name, self.status)
+        return u'{} || status: {}'.format(self.username.username, self.status)
 
 
 class Shop(models.Model):
@@ -52,3 +55,21 @@ class Item(models.Model):
 
     def __str__(self):
         return '{} || {} ||{}'.format(str(self.shop.name), str(self.category.title), self.title)
+
+
+def random_name(length):
+    return ''.join(
+        random.choice(string.digits) for _ in range(length))
+
+
+class Order(models.Model):
+    shop = models.ForeignKey(Shop,on_delete=models.DO_NOTHING)
+    date = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
+    item = models.ForeignKey(Item, on_delete=models.DO_NOTHING)
+    quantity = models.IntegerField(null=True, blank=True)
+    total_price = models.FloatField(null=True, blank=True)
+    bill_id = models.CharField(max_length=100,default=random_name(10))
+
+    def __str__(self):
+        return '{} || {} ||{}'.format(str(self.user), str(self.item.title), self.total_price)

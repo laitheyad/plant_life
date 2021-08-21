@@ -27,8 +27,13 @@ urlpatterns = [
     path('create-category/', CreateCategory.as_view(), name='create-category'),
     path('create-item/', CreateItem.as_view(), name='create-item'),
     path('get-shop-items/', GetShopItems.as_view(), name='get-shop-items'),
+    path('orders/', Orders.as_view(), name='orders'),
 ]
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+
+
+
