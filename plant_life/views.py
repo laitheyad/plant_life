@@ -1,4 +1,5 @@
 import ast
+import datetime
 
 from django.contrib import auth
 from django.contrib.auth.models import User as SuperUser
@@ -182,6 +183,7 @@ def random_name(length):
     return ''.join(
         random.choice(string.digits) for _ in range(length))
 
+
 class Orders(APIView):
     def post(self, request):
         try:
@@ -190,13 +192,13 @@ class Orders(APIView):
             shop_id = request.POST['shop_id']
             user = User.objects.get(username__username=username)
             print(items_ids)
-            bill_id =random_name(10)
+            bill_id = random_name(10)
             items_ids = convert_to_list(items_ids)
             for item_id in items_ids:
                 item = Item.objects.get(pk=list(item_id.keys())[0])
                 order = Order.objects.create(shop=Shop.objects.get(id=shop_id), item=item, user=user,
                                              quantity=item_id[list(item_id.keys())[0]],
-                                             total_price=item_id[list(item_id.keys())[0]] * item.price,bill_id=bill_id)
+                                             total_price=item_id[list(item_id.keys())[0]] * item.price, bill_id=bill_id)
 
             return JsonResponse({'status': 'success', 'message': bill_id})
         except Exception as e:
@@ -204,14 +206,21 @@ class Orders(APIView):
             return JsonResponse({'status': 'false', 'message': str(e)})
 
     def get(self, request):
-        shops = list(Shop.objects.all().values())
-        for shop in shops:
-            cat_list = []
-            cat = Category.objects.filter(shop=shop['id'])
-            for c in cat:
-                cat_list.append({'title': c.title, 'id': c.id})
-            shop['category_list'] = cat_list
-        return JsonResponse({'status': 'true', 'items': shops})
+        username = request.POST['username']
+        user = User.objects.get(username__username=username)
+        orders = list(Order.objects.filter(user=user).values())
+        for order in orders:
+            item = Item.objects.get(pk=order['item_id'])
+            shop = Shop.objects.get(pk=order['shop_id'])
+            order['title'] = item.title
+            order['shop'] = shop.name
+            order['username'] = username
+            order['username'] = username
+            order['price'] = item.price
+            order['avatar'] = item.avatar.name
+            order['avatar_2'] = item.avatar_2.name
+
+        return JsonResponse({'status': 'true', 'items': orders})
 
 # class UpdateInfo(viewsets.ReadOnlyModelViewSet):
 #     permission_classes = [IsAuthenticated]
@@ -246,20 +255,3 @@ class Orders(APIView):
 #         # except:
 #         #     return JsonResponse({'message': 'error while receiving data'})
 
-
-# class AllMeals(viewsets.ReadOnlyModelViewSet):
-#     permission_classes = [IsAuthenticated]
-
-#     serializer_class = MealSerializer
-#     queryset = Meal.objects.filter(status='Approved')
-
-
-# class ApprovedMeals(APIView):
-#     permission_classes = [IsAuthenticated]
-
-#     def get(self, request):
-#         try:
-#             pending_meals = Meal.objects.filter(status='Approved').values()
-#             return JsonResponse({'message': 'success', 'pending_meals': list(pending_meals)})
-#         except:
-#             return JsonResponse({'message': 'false'})
