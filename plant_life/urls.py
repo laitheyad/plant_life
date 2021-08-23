@@ -28,6 +28,8 @@ urlpatterns = [
     path('create-item/', CreateItem.as_view(), name='create-item'),
     path('get-shop-items/', GetShopItems.as_view(), name='get-shop-items'),
     path('orders/', Orders.as_view(), name='orders'),
+    path('slider/', SliderImages.as_view(), name='slider'),
+    path('upload-image/', UploadImage.as_view(), name='upload-image'),
 ]
 
 if settings.DEBUG:

@@ -184,6 +184,12 @@ def random_name(length):
         random.choice(string.digits) for _ in range(length))
 
 
+class SliderImages(APIView):
+    def get(self, request):
+        items = list(Slider.objects.all().values())
+        return JsonResponse({'status': 'true', 'items': items})
+
+
 class Orders(APIView):
     def post(self, request):
         try:
@@ -222,6 +228,19 @@ class Orders(APIView):
 
         return JsonResponse({'status': 'true', 'items': orders})
 
+
+class UploadImage(APIView):
+    def post(self, request):
+        try:
+            order_id = request.POST['order_id']
+            image = request.FILES['file']
+            order = Order.objects.get(pk=order_id)
+            order.image = image
+            order.save()
+            return JsonResponse({'status': 'true', 'message': 'image uploaded successfully'})
+        except Exception as e:
+            return JsonResponse({'status': 'false', 'message': str(e)})
+
 # class UpdateInfo(viewsets.ReadOnlyModelViewSet):
 #     permission_classes = [IsAuthenticated]
 
@@ -254,4 +273,3 @@ class Orders(APIView):
 #         return JsonResponse({'message': 'success'})
 #         # except:
 #         #     return JsonResponse({'message': 'error while receiving data'})
-
