@@ -26,6 +26,7 @@ class User(models.Model):
 
 
 class Shop(models.Model):
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=500)
     avatar = models.ImageField(null=True, blank=True)
     description = models.TextField(null=True, blank=True)
