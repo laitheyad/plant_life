@@ -129,7 +129,7 @@ class CreateCategory(APIView):
     def get(self, request):
         username = request.POST['username']
         shop = Shop.objects.get(owner__username__username=username)
-        categories =list(Category.objects.filter(shop=shop).values())
+        categories = list(Category.objects.filter(shop=shop).values())
         return JsonResponse({'status': 'success', 'items': categories})
 
 
@@ -250,6 +250,45 @@ class UploadImage(APIView):
         except Exception as e:
             return JsonResponse({'status': 'false', 'message': str(e)})
 
+
+class GetUserInfo(APIView):
+    def post(self, request):
+        username = request.POST['username']
+        user = User.objects.get(username__username=username)
+        return JsonResponse({'status': 'true', 'user': user})
+
+
+class GetOrdersItems(APIView):
+    # permission_classes = [IsAuthenticated]
+    def post(self, request):
+
+        try:
+            username = request.POST.get('username', None)
+            category_id = request.POST.get('category_id', None)
+            shop = Shop.objects.get(owner__username__username=username)
+            categories = Category.objects.filter(shop=shop)
+            cat_objects = {}
+            for cat in categories:
+                cat_objects[cat.pk] = cat.title
+            if username:
+                if not category_id:
+                    items = list(Order.objects.filter(shop=shop).values())
+                else:
+                    items = list(Order.objects.filter(shop=shop, item__category__id=category_id).values())
+                for item in items:
+                    te_object = Item.objects.get(pk=item['item_id'])
+                    item['category_title'] = te_object.category.title
+                    item['avatar'] = te_object.avatar.name
+                    item['title'] = te_object.title
+                    item['price'] = te_object.price
+                    user = User.objects.get(pk=item['user_id'])
+                    item['username'] = user.username.username
+                return JsonResponse({'status': 'success', 'items': items})
+            else:
+                return JsonResponse({'status': 'false', 'message': 'No username were provided'})
+        except Exception as e:
+            print(e)
+            return JsonResponse({'status': 'false', 'message': 'error while receiving data'})
 # class UpdateInfo(viewsets.ReadOnlyModelViewSet):
 #     permission_classes = [IsAuthenticated]
 

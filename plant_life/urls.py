@@ -27,9 +27,11 @@ urlpatterns = [
     path('create-category/', CreateCategory.as_view(), name='create-category'),
     path('create-item/', CreateItem.as_view(), name='create-item'),
     path('get-shop-items/', GetShopItems.as_view(), name='get-shop-items'),
+    path('get-orders-items/', GetOrdersItems.as_view(), name='get-orders-items'),
     path('orders/', Orders.as_view(), name='orders'),
     path('slider/', SliderImages.as_view(), name='slider'),
     path('upload-image/', UploadImage.as_view(), name='upload-image'),
+    path('get-user-info/', GetUserInfo.as_view(), name='get-user-info'),
 ]
 
 if settings.DEBUG:
