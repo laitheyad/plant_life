@@ -59,10 +59,10 @@ class Item(models.Model):
 
 
 class Order(models.Model):
-    shop = models.ForeignKey(Shop, on_delete=models.DO_NOTHING)
+    shop = models.ForeignKey(Shop, on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now_add=True)
-    user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
-    item = models.ForeignKey(Item, on_delete=models.DO_NOTHING)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    item = models.ForeignKey(Item, on_delete=models.CASCADE)
     quantity = models.IntegerField(null=True, blank=True)
     total_price = models.FloatField(null=True, blank=True)
     bill_id = models.CharField(max_length=100, null=True, blank=True)
