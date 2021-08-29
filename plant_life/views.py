@@ -17,14 +17,12 @@ class RegisterUser(APIView):
     def post(self, request):
         try:
             username = request.POST['username']
-            # first_name = request.POST['first_name']
-            # last_name = request.POST['last_name']
-            # date_of_birth = request.POST['date_of_birth']
             phone = request.POST['phone']
             email = request.POST['email']
             status = request.POST['status']
             password = request.POST['password']
-            # avatar = request.FILES['avatar']
+            # if(len(password)<8):
+            #     return JsonResponse({'message': 'password length must be at least be 8 char'})
         except:
             return JsonResponse({'message': 'error while receiving data'})
         #   Creating Super user to authenticate with the given data
